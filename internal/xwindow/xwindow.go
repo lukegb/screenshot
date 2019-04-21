@@ -12,7 +12,7 @@ import (
 	"github.com/BurntSushi/xgb/xinerama"
 	"github.com/BurntSushi/xgb/xproto"
 	"github.com/gen2brain/shm"
-	"github.com/kbinani/screenshot/internal/util"
+	"github.com/lukegb/screenshot/internal/util"
 )
 
 var (
