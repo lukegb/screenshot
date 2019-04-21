@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"sync"
 
 	"github.com/BurntSushi/xgb"
 	mshm "github.com/BurntSushi/xgb/shm"
@@ -14,6 +15,19 @@ import (
 	"github.com/kbinani/screenshot/internal/util"
 )
 
+var (
+	xgbConnOnce sync.Once
+	xgbConn     *xgb.Conn
+	xgbConnErr  error
+)
+
+func newXGBConn() (*xgb.Conn, error) {
+	xgbConnOnce.Do(func() {
+		xgbConn, xgbConnErr = xgb.NewConn()
+	})
+	return xgbConn, xgbConnErr
+}
+
 func Capture(x, y, width, height int) (img *image.RGBA, e error) {
 	defer func() {
 		err := recover()
@@ -22,7 +36,7 @@ func Capture(x, y, width, height int) (img *image.RGBA, e error) {
 			e = errors.New(fmt.Sprintf("%v", err))
 		}
 	}()
-	c, err := xgb.NewConn()
+	c, err := newXGBConn()
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +152,7 @@ func NumActiveDisplays() (num int) {
 		}
 	}()
 
-	c, err := xgb.NewConn()
+	c, err := newXGBConn()
 	if err != nil {
 		return 0
 	}
@@ -166,7 +180,7 @@ func GetDisplayBounds(displayIndex int) (rect image.Rectangle) {
 		}
 	}()
 
-	c, err := xgb.NewConn()
+	c, err := newXGBConn()
 	if err != nil {
 		return image.ZR
 	}
