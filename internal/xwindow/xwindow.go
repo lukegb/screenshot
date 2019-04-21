@@ -40,7 +40,6 @@ func Capture(x, y, width, height int) (img *image.RGBA, e error) {
 	if err != nil {
 		return nil, err
 	}
-	defer c.Close()
 
 	err = xinerama.Init(c)
 	if err != nil {
@@ -156,7 +155,6 @@ func NumActiveDisplays() (num int) {
 	if err != nil {
 		return 0
 	}
-	defer c.Close()
 
 	err = xinerama.Init(c)
 	if err != nil {
@@ -184,7 +182,6 @@ func GetDisplayBounds(displayIndex int) (rect image.Rectangle) {
 	if err != nil {
 		return image.ZR
 	}
-	defer c.Close()
 
 	err = xinerama.Init(c)
 	if err != nil {
