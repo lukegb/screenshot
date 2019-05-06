@@ -71,15 +71,11 @@ func Capture(x, y, width, height int) (img *image.RGBA, e error) {
 		return nil, err
 	}
 
-	// Paint with opaque black
-	index := 0
-	for iy := 0; iy < height; iy++ {
-		j := index
-		for ix := 0; ix < width; ix++ {
-			img.Pix[j+3] = 255
-			j += 4
-		}
-		index += img.Stride
+	// Paint with opaque black, based on the implementation of bytes.Repeat.
+	bp := copy(img.Pix, []byte{0, 0, 0, 255})
+	for bp < len(img.Pix) {
+		copy(img.Pix[bp:], img.Pix[:bp])
+		bp *= 2
 	}
 
 	if !intersect.Empty() {
