@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"image"
-	"image/color"
 	"sync"
 
 	"github.com/BurntSushi/xgb"
@@ -129,14 +128,22 @@ func Capture(x, y, width, height int) (img *image.RGBA, e error) {
 
 		// BitBlt by hand
 		offset := 0
+		iRowOffset := (intersect.Min.Y - (y + y0)) * img.Stride
+		iColOffset := (intersect.Min.X - (x + x0)) * 4
+		io := iRowOffset + iColOffset
+		stride := img.Stride - (intersect.Max.X-intersect.Min.X)*4
 		for iy := intersect.Min.Y; iy < intersect.Max.Y; iy++ {
 			for ix := intersect.Min.X; ix < intersect.Max.X; ix++ {
-				r := data[offset+2]
-				g := data[offset+1]
-				b := data[offset]
-				img.SetRGBA(ix-(x+x0), iy-(y+y0), color.RGBA{r, g, b, 255})
+				px := img.Pix[io : io+4 : io+4]
+				d := data[offset : offset+3 : offset+3]
+				px[0] = d[2]
+				px[1] = d[1]
+				px[2] = d[0]
+				px[3] = 255
 				offset += 4
+				io += 4
 			}
+			io += stride
 		}
 	}
 
